@@ -16,5 +16,5 @@ public interface AdminService extends IService<Admin> {
 
 
 
-    IPage<Admin> getPageList(Page<Admin> adminPage, AdminQueryVo adminQueryVo);
+    IPage<Admin> getPageList(Page<Admin> adminPage, AdminQueryVo vo);
 }

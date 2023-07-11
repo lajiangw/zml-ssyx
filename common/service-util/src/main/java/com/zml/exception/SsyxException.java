@@ -34,6 +34,8 @@ public class SsyxException extends RuntimeException {
         this.code = resultCodeEnum.getCode();
     }
 
+
+
     @Override
     public String toString() {
         return "GuliException{" +

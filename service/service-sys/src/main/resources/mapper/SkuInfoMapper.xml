@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.SkuInfoMapper">
+
+    <resultMap id="BaseResultMap" type="generator.domain.SkuInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
+            <result property="attrGroupId" column="attr_group_id" jdbcType="BIGINT"/>
+            <result property="skuType" column="sku_type" jdbcType="TINYINT"/>
+            <result property="skuName" column="sku_name" jdbcType="VARCHAR"/>
+            <result property="imgUrl" column="img_url" jdbcType="VARCHAR"/>
+            <result property="perLimit" column="per_limit" jdbcType="INTEGER"/>
+            <result property="publishStatus" column="publish_status" jdbcType="TINYINT"/>
+            <result property="checkStatus" column="check_status" jdbcType="TINYINT"/>
+            <result property="isNewPerson" column="is_new_person" jdbcType="TINYINT"/>
+            <result property="sort" column="sort" jdbcType="INTEGER"/>
+            <result property="skuCode" column="sku_code" jdbcType="VARCHAR"/>
+            <result property="price" column="price" jdbcType="DECIMAL"/>
+            <result property="marketPrice" column="market_price" jdbcType="DECIMAL"/>
+            <result property="stock" column="stock" jdbcType="INTEGER"/>
+            <result property="lockStock" column="lock_stock" jdbcType="INTEGER"/>
+            <result property="lowStock" column="low_stock" jdbcType="INTEGER"/>
+            <result property="sale" column="sale" jdbcType="INTEGER"/>
+            <result property="wareId" column="ware_id" jdbcType="BIGINT"/>
+            <result property="version" column="version" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,category_id,attr_group_id,
+        sku_type,sku_name,img_url,
+        per_limit,publish_status,check_status,
+        is_new_person,sort,sku_code,
+        price,market_price,stock,
+        lock_stock,low_stock,sale,
+        ware_id,version,create_time,
+        update_time,is_deleted
+    </sql>
+</mapper>

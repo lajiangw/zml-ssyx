@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="generator.mapper.AttrMapper">
+
+    <resultMap id="BaseResultMap" type="generator.domain.Attr">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="CHAR"/>
+            <result property="inputType" column="input_type" jdbcType="INTEGER"/>
+            <result property="selectList" column="select_list" jdbcType="VARCHAR"/>
+            <result property="attrGroupId" column="attr_group_id" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,input_type,
+        select_list,attr_group_id,create_time,
+        update_time,is_deleted
+    </sql>
+</mapper>

@@ -27,10 +27,9 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin>
         String name = adminQueryVo.getName();
         String username = adminQueryVo.getUsername();
         LambdaQueryWrapper<Admin> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(!StringUtils.isEmpty(username), Admin::getUsername, username);
+        wrapper.like(!StringUtils.isEmpty(username), Admin::getUsername, username);
         wrapper.like(!StringUtils.isEmpty(name), Admin::getName, name);
-        Page<Admin> adminPage1 = baseMapper.selectPage(adminPage, wrapper);
-        return adminPage1;
+        return baseMapper.selectPage(adminPage, wrapper);
     }
 }
 

@@ -6,6 +6,7 @@ import com.alibaba.druid.util.StringUtils;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zml.acl.service.AdminService;
+import com.zml.acl.service.RoleService;
 import com.zml.result.Result;
 import com.zml.ssyx.model.acl.Admin;
 import com.zml.ssyx.vo.acl.AdminQueryVo;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author ZhangMinlei
@@ -23,20 +25,37 @@ import java.util.List;
  */
 @RestController
 @Api(tags = "用户接口")
-//TODO 用户接口前端无法显示！
-@CrossOrigin("http://localhost:9528")
+//TODO 用户接口前端无法显示！疑似是跨域问题
+@CrossOrigin(origins = "http://localhost:9528")
 @RequestMapping("/admin/acl/user")
 public class AdminController {
 
     @Autowired
     private AdminService adminService;
 
+    @Autowired
+    private RoleService roleService;
+
+    //    给用户分配角色
+    @ApiOperation("用户分配角色")
+    @PostMapping("/doAssign")
+    public Result doAssign(@RequestParam Long adminId, @RequestParam List<Long> roleId) {
+        return roleService.savaAdminRole(adminId, roleId) ? Result.ok() : Result.fail();
+    }
+
+    @ApiOperation("获取用户角色")
+    @GetMapping("/toAssign/{adminId}")
+    public Result toAssign(@PathVariable Long adminId) {
+        Map<String, Object> map = roleService.getRoleByAdmin(adminId);
+        return Result.ok(map);
+    }
+
     //    获取后台用户分页列表(带搜索)
     @GetMapping("/{page}/{limit}}")
     @ApiOperation("获取后台用户分页列表")
-    public Result<IPage<Admin>> getPageList(@PathVariable Long page, @PathVariable Long limit, AdminQueryVo adminQueryVo) {
+    public Result<IPage<Admin>> getPageList(@PathVariable Long page, @PathVariable Long limit, AdminQueryVo vo) {
         Page<Admin> adminPage = new Page<>(page, limit);
-        IPage<Admin> pageList = adminService.getPageList(adminPage, adminQueryVo);
+        IPage<Admin> pageList = adminService.getPageList(adminPage, vo);
         return Result.ok(pageList);
     }
 
