@@ -3,6 +3,7 @@ package com.zml.client.product.fallbackImpl;
 import com.zml.client.product.ProductFeignClient;
 import com.zml.ssyx.model.product.Category;
 import com.zml.ssyx.model.product.SkuInfo;
+import com.zml.ssyx.vo.product.SkuInfoVo;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Component;
 
@@ -48,6 +49,11 @@ public class ProductFeignClientFallBack implements ProductFeignClient {
 
     @Override
     public List<SkuInfo> findNewPersonSkuInfoList() {
+        return null;
+    }
+
+    @Override
+    public SkuInfoVo getSkuInfoVo(Long skuId) {
         return null;
     }
 }

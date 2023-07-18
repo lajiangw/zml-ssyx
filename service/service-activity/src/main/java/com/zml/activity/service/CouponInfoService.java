@@ -8,6 +8,7 @@ import com.zml.ssyx.model.activity.CouponInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zml.ssyx.vo.activity.CouponRuleVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,4 +25,7 @@ public interface CouponInfoService extends IService<CouponInfo> {
     Map<String,Object> findCouponRuleList(Long id);
 
     void saveCouponRule(CouponRuleVo ruleVo);
+
+    List<CouponInfo> findCouponInfoList(Long skuId, Long userId);
+
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zml.ssyx.model.activity.ActivityInfo;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zml.ssyx.model.activity.ActivityRule;
 import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.vo.activity.ActivityRuleVo;
 
@@ -20,11 +21,15 @@ public interface ActivityInfoService extends IService<ActivityInfo> {
 
     IPage<ActivityInfo> getPageList(Page<ActivityInfo> activityInfoPage);
 
-    Map<String,Object> findActivityRuleList(Long id);
+    Map<String,Object> findActivityRuleList(Long activityId);
 
     void saveActivityRule(ActivityRuleVo activityRule);
 
     List<SkuInfo> findSkuInfoByKeyword(String keyword);
 
     Map<Long, List<String>> findActivity(List<Long> skuIdList);
+
+    Map<String, Object> findActivityAndCoupon(Long skuId, Long userId);
+
+    List<ActivityRule> findActivityRule(Long skuId);
 }

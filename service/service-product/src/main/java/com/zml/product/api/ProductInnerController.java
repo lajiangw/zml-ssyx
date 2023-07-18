@@ -4,6 +4,7 @@ import com.zml.product.service.CategoryService;
 import com.zml.product.service.SkuInfoService;
 import com.zml.ssyx.model.product.Category;
 import com.zml.ssyx.model.product.SkuInfo;
+import com.zml.ssyx.vo.product.SkuInfoVo;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -64,5 +65,10 @@ public class ProductInnerController {
      return   skuInfoService.findNewPersonSkuInfoList();
     }
 
+//    根据skuId获得Sku信息
+    @GetMapping("/inner/getSkuInfoVo/{skuId}")
+    public SkuInfoVo getSkuInfoVo(@PathVariable Long skuId){
+        return skuInfoService.getSkuInfoVo(skuId);
+    }
 
 }

@@ -16,4 +16,9 @@ public class SearchFeignClientImpl implements SearchFeignClient {
         System.out.println("findHostSkuList错误！");
         return null;
     }
+
+    @Override
+    public boolean incrHotScore(Long skuId) {
+        return false;
+    }
 }

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
 import com.zml.mq.constant.MqConst;
 import com.zml.mq.service.RabbitService;
 import com.zml.product.mapper.SkuInfoMapper;
@@ -16,11 +15,10 @@ import com.zml.product.service.SkuPosterService;
 import com.zml.ssyx.model.product.SkuAttrValue;
 import com.zml.ssyx.model.product.SkuImage;
 import com.zml.ssyx.model.product.SkuInfo;
-
 import com.zml.ssyx.model.product.SkuPoster;
 import com.zml.ssyx.vo.product.SkuInfoQueryVo;
 import com.zml.ssyx.vo.product.SkuInfoVo;
-import javafx.scene.control.Skin;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -219,6 +217,27 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
                 .orderByAsc(SkuInfo::getStock);
         return baseMapper.selectPage(skuInfoPage, wrapper).getRecords();
 
+    }
+
+    @Override
+    public SkuInfoVo getSkuInfoVo(Long skuId) {
+        SkuInfoVo skuInfoVo = new SkuInfoVo();
+//        查询基本信息
+        SkuInfo skuInfo = baseMapper.selectById(skuId);
+
+//        查询图片
+        List<SkuImage> imageList = skuImageService.getImageList(skuId);
+
+//        查询海报
+        List<SkuPoster> posterList = skuPosterService.getPosterList(skuId);
+
+//        查询属性
+        List<SkuAttrValue> attrValuesList = skuAttrValueService.getAttrValuesList(skuId);
+        BeanUtils.copyProperties(skuInfo, skuInfoVo);
+        skuInfoVo.setSkuPosterList(posterList);
+        skuInfoVo.setSkuImagesList(imageList);
+        skuInfoVo.setSkuAttrValueList(attrValuesList);
+        return skuInfoVo;
     }
 }
 

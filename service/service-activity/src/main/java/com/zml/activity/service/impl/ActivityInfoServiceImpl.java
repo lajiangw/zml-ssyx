@@ -10,14 +10,17 @@ import com.zml.activity.mapper.ActivitySkuMapper;
 import com.zml.activity.service.ActivityInfoService;
 import com.zml.activity.service.ActivityRuleService;
 import com.zml.activity.service.ActivitySkuService;
+import com.zml.activity.service.CouponInfoService;
 import com.zml.client.product.ProductFeignClient;
 import com.zml.ssyx.enums.ActivityType;
 import com.zml.ssyx.model.activity.ActivityInfo;
 import com.zml.ssyx.model.activity.ActivityRule;
 import com.zml.ssyx.model.activity.ActivitySku;
+import com.zml.ssyx.model.activity.CouponInfo;
 import com.zml.ssyx.model.base.BaseEntity;
 import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.vo.activity.ActivityRuleVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -52,6 +55,9 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
     @Resource
     private ActivitySkuService activitySkuService;
+
+    @Autowired
+    private CouponInfoService couponInfoService;
 
 
     @Override
@@ -148,6 +154,33 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
             }
         });
         return map;
+    }
+
+    @Override
+    public Map<String, Object> findActivityAndCoupon(Long skuId, Long userId) {
+//        根据skuId 查询sku营销活动 一个活动有多个规则
+        List<ActivityRule> activityRuleList = this.findActivityRule(skuId);
+//        2 根据skuId+userId查询优惠卷信息
+        List<CouponInfo> couponInfoList = couponInfoService.findCouponInfoList(skuId, userId);
+//        3 封装到Map中 返回
+        Map<String, Object> map = new HashMap<>();
+        map.put("couponInfoList", couponInfoList);
+        map.put("activityRuleList", activityRuleList);
+
+        return null;
+    }
+
+    //    根据skuid查询活动规则
+    @Override
+    public List<ActivityRule> findActivityRule(Long skuId) {
+        List<ActivityRule> activityRule = baseMapper.findActivityRule(skuId);
+        for (ActivityRule rule : activityRule) {
+            String ruleDesc = this.getRuleDesc(rule);
+            rule.setRuleDesc(ruleDesc);
+        }
+
+        return activityRule;
+
     }
 
 

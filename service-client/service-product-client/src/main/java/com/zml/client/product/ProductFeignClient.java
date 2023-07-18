@@ -2,6 +2,7 @@ package com.zml.client.product;
 
 import com.zml.ssyx.model.product.Category;
 import com.zml.ssyx.model.product.SkuInfo;
+import com.zml.ssyx.vo.product.SkuInfoVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +27,7 @@ public interface ProductFeignClient {
     SkuInfo getSkuInfo(@PathVariable Long skuId);
 
     @GetMapping("/api/product/inner/get/SkuInfo/{ids}")
-    List<SkuInfo> getSkuInfos(@PathVariable List<Long> ids);
+    public List<SkuInfo> getSkuInfos(@PathVariable List<Long> ids);
 
     @GetMapping("/api/product/inner/findSkuInfoByKeyWord/{keyWord}")
     List<SkuInfo> findSkuInfoByKeyWord(@PathVariable String keyWord);
@@ -39,5 +40,8 @@ public interface ProductFeignClient {
 
     @GetMapping("/api/product/inner/findNewPersonSkuInfoList")
     public List<SkuInfo> findNewPersonSkuInfoList();
+
+    @GetMapping("/api/product/inner/getSkuInfoVo/{skuId}")
+    public SkuInfoVo getSkuInfoVo(@PathVariable Long skuId);
 
 }
