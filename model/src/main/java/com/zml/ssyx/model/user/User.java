@@ -16,7 +16,7 @@ public class User extends BaseEntity {
 	private static final long serialVersionUID = 1L;
 
 	@TableField("user_type")
-	private UserType userType;
+	private Integer userType;
 
 	@ApiModelProperty(value = "会员头像")
 	@TableField("photo_url")

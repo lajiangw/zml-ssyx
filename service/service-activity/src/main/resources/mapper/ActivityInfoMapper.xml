@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zml.activity.mapper.ActivityInfoMapper">
+
+
+    <select id="selectSkuIdListExits" resultType="Long" >
+        select sku.sku_id
+        from `shequ-activity`.activity_info info
+        inner join `shequ-activity`.activity_sku sku on info.id = sku.activity_id
+        <where>
+            <if test="skuIdList != null">
+                and sku.sku_id in
+                <foreach collection="skuIdList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        and now() between info.start_time and info.end_time
+    </select>
+</mapper>

@@ -2,6 +2,7 @@ server:
   port: 8203
 
 mybatis-plus:
+  type-enums-package: com.zml.ssyx.enums
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
@@ -12,6 +13,19 @@ spring:
     url: jdbc:mysql://localhost:3306/shequ-product?characterEncoding=utf-8&useSSL=false
     username: root
     password: root
+
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    publisher-confirm-type: CORRELATED  #发布确认模式，消息是否被成功发送到交换机
+    publisher-returns: true
+    listener:
+      simple:
+        prefetch: 1
+        concurrency: 3
+        acknowledge-mode: manual   #消费端手动确认
 
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

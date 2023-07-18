@@ -20,7 +20,7 @@ import java.util.List;
  * @date 2023-07-11 14:11
  */
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/admin/product/category")
 public class CategoryController {
 

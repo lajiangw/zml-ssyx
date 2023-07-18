@@ -16,7 +16,7 @@ import java.util.List;
  */
 @RequestMapping("/admin/sys/region")
 @RestController
-@CrossOrigin
+//@CrossOrigin
 public class RegionController {
 
     @Resource

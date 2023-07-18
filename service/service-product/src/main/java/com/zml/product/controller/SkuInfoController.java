@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @Api(value = "SkuInfo管理", tags = "商品Sku管理")
 @RequestMapping("/admin/product/skuInfo")
-@CrossOrigin
+//@CrossOrigin
 public class SkuInfoController {
 
     @Autowired
@@ -66,13 +66,34 @@ public class SkuInfoController {
     @ApiOperation("根据id删除")
     @DeleteMapping("/remove/{id}")
     public Result removeById(@PathVariable Long id) {
-        return skuInfoService.removeById(id) ? Result.ok() : Result.fail();
+        skuInfoService.deleteById(id);
+        return Result.ok();
     }
 
     @ApiOperation("批量删除")
     @DeleteMapping("batchRemove")
-    public Result batchRemove(List<Long> idList){
-        return skuInfoService.removeByIds(idList)? Result.ok() : Result.fail();
+    public Result batchRemove(List<Long> idList) {
+        return skuInfoService.removeByIds(idList) ? Result.ok() : Result.fail();
+    }
+
+    @ApiOperation("商品审核")
+    @GetMapping("/check/{id}/{status}")
+    public Result check(@PathVariable Long id, @PathVariable Integer status) {
+        skuInfoService.chek(id, status);
+        return Result.ok();
+    }
+
+    @ApiOperation("商品上架")
+    @GetMapping("/publish/{id}/{status}")
+    public Result publish(@PathVariable Long id, @PathVariable Integer status) {
+        skuInfoService.publish(id, status);
+        return Result.ok();
+    }
+
+    @ApiOperation("新人专项")
+    @GetMapping("/isNewPerson/{id}/{status}")
+    public Result isNewPerson(@PathVariable Long id, @PathVariable Integer status) {
+        return skuInfoService.isNewPerson(id, status) ? Result.ok() : Result.fail();
     }
 
 

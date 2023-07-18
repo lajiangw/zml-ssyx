@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Api(tags = "开通区域接口")
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/admin/sys/regionWare")
 public class RegionWareController {
 

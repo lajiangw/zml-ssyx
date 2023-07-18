@@ -20,7 +20,7 @@ import java.util.List;
  * @date 2023-07-11 11:26
  */
 @RequestMapping("/admin/sys/ware")
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @Api(tags = "仓库模块")
 public class WareController {

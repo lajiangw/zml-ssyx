@@ -26,7 +26,7 @@ import java.util.Map;
 @RestController
 @Api(tags = "用户接口")
 //TODO 用户接口前端无法显示！疑似是跨域问题
-@CrossOrigin(origins = "http://localhost:9528")
+//@CrossOrigin(origins = "http://localhost:9528")
 @RequestMapping("/admin/acl/user")
 public class AdminController {
 
@@ -51,13 +51,17 @@ public class AdminController {
     }
 
     //    获取后台用户分页列表(带搜索)
-    @GetMapping("/{page}/{limit}}")
+    @GetMapping("/{page}/{limit}")
     @ApiOperation("获取后台用户分页列表")
     public Result<IPage<Admin>> getPageList(@PathVariable Long page, @PathVariable Long limit, AdminQueryVo vo) {
         Page<Admin> adminPage = new Page<>(page, limit);
         IPage<Admin> pageList = adminService.getPageList(adminPage, vo);
         return Result.ok(pageList);
+
+
     }
+
+
 
     //    根据ID获取某个后台用户
     @ApiOperation("根据IP查询用户")

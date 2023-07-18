@@ -4,10 +4,11 @@ package com.zml.product.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.vo.product.SkuInfoQueryVo;
 import com.zml.ssyx.vo.product.SkuInfoVo;
+
+import java.util.List;
 
 /**
 * @author ZHANGMINLEI
@@ -23,4 +24,18 @@ public interface SkuInfoService extends IService<SkuInfo> {
     SkuInfoVo getSkuInfo(Long id);
 
     Boolean updateSku(SkuInfoVo skuInfoVo);
+
+    void chek(Long id, Integer status);
+
+    void publish(Long id, Integer status);
+
+    Boolean isNewPerson(Long id, Integer status);
+
+    void deleteById(Long id);
+
+    List<SkuInfo> findSkuInfoByKeyWord(String keyWord);
+
+    List<SkuInfo> findNewPersonSkuInfoList();
+
+
 }
