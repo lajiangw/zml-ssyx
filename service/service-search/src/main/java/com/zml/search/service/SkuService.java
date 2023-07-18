@@ -1,6 +1,9 @@
 package com.zml.search.service;
 
 import com.zml.ssyx.model.search.SkuEs;
+import com.zml.ssyx.vo.search.SkuEsQueryVo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,4 +20,6 @@ public interface SkuService {
     void deleteById(Long id);
 
     List<SkuEs> findHostSkuList();
+
+    Page<SkuEs> search(Pageable pageable, SkuEsQueryVo skuEsQueryVo);
 }

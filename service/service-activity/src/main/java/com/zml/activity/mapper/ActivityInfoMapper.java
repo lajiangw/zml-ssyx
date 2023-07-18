@@ -3,6 +3,7 @@ package com.zml.activity.mapper;
 import com.zml.ssyx.model.activity.ActivityInfo;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.zml.ssyx.model.activity.ActivityRule;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public interface ActivityInfoMapper extends BaseMapper<ActivityInfo> {
     List<Long> selectSkuIdListExits(@Param("skuIdList") List<Long> skuIdList);
 
 
+    List<ActivityRule> findActivityRule(@Param("skuId") Long skuid);
 }
 
 

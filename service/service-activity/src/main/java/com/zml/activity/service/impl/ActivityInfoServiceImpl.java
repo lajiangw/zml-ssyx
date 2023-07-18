@@ -11,8 +11,8 @@ import com.zml.activity.service.ActivityInfoService;
 import com.zml.activity.service.ActivityRuleService;
 import com.zml.activity.service.ActivitySkuService;
 import com.zml.client.product.ProductFeignClient;
+import com.zml.ssyx.enums.ActivityType;
 import com.zml.ssyx.model.activity.ActivityInfo;
-
 import com.zml.ssyx.model.activity.ActivityRule;
 import com.zml.ssyx.model.activity.ActivitySku;
 import com.zml.ssyx.model.base.BaseEntity;
@@ -23,7 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +52,7 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
 
     @Resource
     private ActivitySkuService activitySkuService;
+
 
     @Override
     public IPage<ActivityInfo> getPageList(Page<ActivityInfo> activityInfoPage) {
@@ -128,6 +132,45 @@ public class ActivityInfoServiceImpl extends ServiceImpl<ActivityInfoMapper, Act
             }
         });
         return skuInfoList;
+    }
+
+    @Override
+    public Map<Long, List<String>> findActivity(List<Long> skuIdList) {
+        Map<Long, List<String>> map = new HashMap<>();
+        skuIdList.forEach(skuid -> {
+            List<ActivityRule> activityRuleList = baseMapper.findActivityRule(skuid);
+            if (!CollectionUtils.isEmpty(activityRuleList)) {
+                ArrayList<String> list = new ArrayList<>();
+                for (ActivityRule rule : activityRuleList) {
+                    list.add(this.getRuleDesc(rule));
+                }
+                map.put(skuid, list);
+            }
+        });
+        return map;
+    }
+
+
+    //构造规则名称的方法
+    private String getRuleDesc(ActivityRule activityRule) {
+        ActivityType activityType = activityRule.getActivityType();
+        StringBuffer ruleDesc = new StringBuffer();
+        if (activityType == ActivityType.FULL_REDUCTION) {
+            ruleDesc
+                    .append("满")
+                    .append(activityRule.getConditionAmount())
+                    .append("元减")
+                    .append(activityRule.getBenefitAmount())
+                    .append("元");
+        } else {
+            ruleDesc
+                    .append("满")
+                    .append(activityRule.getConditionNum())
+                    .append("元打")
+                    .append(activityRule.getBenefitDiscount())
+                    .append("折");
+        }
+        return ruleDesc.toString();
     }
 }
 

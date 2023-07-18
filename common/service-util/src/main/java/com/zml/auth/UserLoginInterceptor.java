@@ -34,10 +34,11 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         if (!StringUtils.isEmpty(token)) {
             Long userId = JwtHelper.getUserId(token);
             UserLoginVo loginVo = (UserLoginVo) redisTemplate.opsForValue().get(RedisConst.USER_LOGIN_KEY_PREFIX + userId);
-            if (!StringUtils.isEmpty(loginVo)) {
+            if (loginVo != null) {
                 AuthContextHolder.setUserId(userId);
-                AuthContextHolder.setUserLoginVo(loginVo);
                 AuthContextHolder.setWareId(loginVo.getWareId());
+                AuthContextHolder.setUserLoginVo(loginVo);
+
             }
         }
     }

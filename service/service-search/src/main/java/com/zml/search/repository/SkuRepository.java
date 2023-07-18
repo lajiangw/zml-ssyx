@@ -13,4 +13,9 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 public interface SkuRepository extends ElasticsearchRepository<SkuEs, Long> {
 
    Page<SkuEs> findByOrderByHotScoreDesc(Pageable pageable);
+
+    Page<SkuEs> findByCategoryIdAndWareId(Long categoryId, Long wareId, Pageable pageable);
+
+
+    Page<SkuEs> findByWareIdAndKeyword(Long wareId, String keyword, Pageable pageable);
 }
