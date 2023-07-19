@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zml.ssyx.model.activity.CouponInfo;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.zml.ssyx.model.order.CartInfo;
 import com.zml.ssyx.vo.activity.CouponRuleVo;
 
 import java.util.List;
@@ -28,4 +29,5 @@ public interface CouponInfoService extends IService<CouponInfo> {
 
     List<CouponInfo> findCouponInfoList(Long skuId, Long userId);
 
+    List<CouponInfo> findCartCouponInfo(List<CartInfo> cartInfoList, Long userId);
 }

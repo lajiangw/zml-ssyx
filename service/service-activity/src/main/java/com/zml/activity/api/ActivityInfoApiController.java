@@ -1,6 +1,9 @@
 package com.zml.activity.api;
 
 import com.zml.activity.service.ActivityInfoService;
+import com.zml.ssyx.model.order.CartInfo;
+import com.zml.ssyx.vo.order.OrderConfirmVo;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,6 +31,13 @@ public class ActivityInfoApiController {
     @GetMapping("/inner/findActivityAndCoupon/{skuId}/{userId}")
     public Map<String, Object> findActivityAndCoupon(@PathVariable Long skuId,
                                                      @PathVariable Long userId) {
-        return activityInfoService.findActivityAndCoupon(skuId,userId);
+        return activityInfoService.findActivityAndCoupon(skuId, userId);
+    }
+
+    @ApiOperation(value = "获取购物车满足条件的促销与优惠券信息")
+    @PostMapping("inner/findCartActivityAndCoupon/{userId}")
+    public OrderConfirmVo findCartActivityAndCoupon(@RequestBody List<CartInfo> cartInfoList,
+                                                    @PathVariable Long userId) {
+        return activityInfoService.findCartActivityAndCoupon(cartInfoList,userId);
     }
 }

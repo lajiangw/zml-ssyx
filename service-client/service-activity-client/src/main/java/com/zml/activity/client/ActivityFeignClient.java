@@ -1,5 +1,8 @@
 package com.zml.activity.client;
 
+import com.zml.ssyx.model.order.CartInfo;
+import com.zml.ssyx.vo.order.OrderConfirmVo;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,4 +27,10 @@ public interface ActivityFeignClient {
     //    根据SkuId 查询营销数据和优惠卷
     @GetMapping("/api/activity/inner/findActivityAndCoupon/{skuId}/{userId}")
     Map<String, Object> findActivityAndCoupon(@PathVariable Long skuId, @PathVariable Long userId);
+
+
+    @ApiOperation(value = "获取购物车满足条件的促销与优惠券信息")
+    @PostMapping("api/activity/inner/findCartActivityAndCoupon/{userId}")
+    public OrderConfirmVo findCartActivityAndCoupon(@RequestBody List<CartInfo> cartInfoList,
+                                                    @PathVariable Long userId);
 }

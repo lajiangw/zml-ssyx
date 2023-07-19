@@ -2,6 +2,7 @@ package com.zml.activity.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zml.ssyx.model.activity.CouponInfo;
+import com.zml.ssyx.model.order.CartInfo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public interface CouponInfoMapper extends BaseMapper<CouponInfo> {
     List<CouponInfo> selectCouponList(@Param("skuId") Long skuId,
                                       @Param("categoryId") Long categoryId,
                                       @Param("userId") Long userId);
+
+    List<CouponInfo> selectCouponInfoList(@Param("userId") Long userId);
 }
 
 

@@ -4,6 +4,7 @@ import com.zml.ssyx.model.activity.ActivityInfo;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zml.ssyx.model.activity.ActivityRule;
+import com.zml.ssyx.model.activity.ActivitySku;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public interface ActivityInfoMapper extends BaseMapper<ActivityInfo> {
 
 
     List<ActivityRule> findActivityRule(@Param("skuId") Long skuid);
+
+    List<ActivitySku> selectCarActivity(@Param("skuIdList") List<Long> skuIdList);
 }
 
 

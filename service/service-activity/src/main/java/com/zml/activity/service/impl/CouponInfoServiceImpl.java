@@ -11,6 +11,8 @@ import com.zml.client.product.ProductFeignClient;
 import com.zml.ssyx.enums.CouponRangeType;
 import com.zml.ssyx.model.activity.CouponInfo;
 import com.zml.ssyx.model.activity.CouponRange;
+import com.zml.ssyx.model.base.BaseEntity;
+import com.zml.ssyx.model.order.CartInfo;
 import com.zml.ssyx.model.product.Category;
 import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.vo.activity.CouponRuleVo;
@@ -19,9 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -110,7 +111,99 @@ public class CouponInfoServiceImpl extends ServiceImpl<CouponInfoMapper, CouponI
     @Override
     public List<CouponInfo> findCouponInfoList(Long skuId, Long userId) {
         SkuInfo skuInfo = productFeignClient.getSkuInfo(skuId);
-       return baseMapper.selectCouponList(skuInfo.getId(), skuInfo.getCategoryId(), userId);
+        return baseMapper.selectCouponList(skuInfo.getId(), skuInfo.getCategoryId(), userId);
+    }
+
+    //获取可以使用的优惠卷列表
+    @Override
+    public List<CouponInfo> findCartCouponInfo(List<CartInfo> cartInfoList, Long userId) {
+        List<CouponInfo> userAllCouponInfo = baseMapper.selectCouponInfoList(userId);
+        if (CollectionUtils.isEmpty(userAllCouponInfo)) {
+            return null;
+        }
+//        2从第一步的list集合中，获取所有优惠卷信息
+        List<Long> couponInfoIdList = userAllCouponInfo.stream().map(BaseEntity::getId).collect(Collectors.toList());
+//        3 查询优惠卷使用范围
+        LambdaQueryWrapper<CouponRange> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(CouponRange::getCouponId, couponInfoIdList);
+        List<CouponRange> couponRangeList = couponRangeMapper.selectList(wrapper);
+//        4 获取优惠卷nid 优惠卷id进行分组，得到map集合
+        Map<Long, List<Long>> couponIdToSkuIdMap = this.findCouponIdToSkuIdMap(cartInfoList, couponRangeList);
+//        5 遍历全部优惠卷集合，判断优惠类型
+//        全场通过  sku和 分类
+        CouponInfo optimalCouponInfo = null;
+        BigDecimal reduceAmount = new BigDecimal(0);
+        for (CouponInfo couponInfo : userAllCouponInfo) {
+            if (CouponRangeType.ALL == couponInfo.getRangeType()) {
+                //全场通用
+                //判断是否满足优惠使用门槛
+                //计算购物车商品的总价
+                BigDecimal totalAmount = computeTotalAmount(cartInfoList);
+                if (totalAmount.subtract(couponInfo.getConditionAmount()).doubleValue() >= 0) {
+                    couponInfo.setIsSelect(1);
+                }
+            } else {
+//                    优惠卷id获取想对应的skuid列表
+                List<Long> skuIdList = couponIdToSkuIdMap.get(couponInfo.getId());
+//                    满足使用范围的购物项
+                List<CartInfo> currentCartInfoList = cartInfoList.stream().filter(cartInfo -> skuIdList.contains(cartInfo.getSkuId())).collect(Collectors.toList());
+                BigDecimal totalAmount = computeTotalAmount(currentCartInfoList);
+                if (totalAmount.subtract(couponInfo.getConditionAmount()).doubleValue() >= 0) {
+                    couponInfo.setIsSelect(1);
+                }
+            }
+            if (couponInfo.getIsSelect().intValue() == 1 && couponInfo.getAmount().subtract(reduceAmount).doubleValue() > 0) {
+                reduceAmount = couponInfo.getAmount();
+                optimalCouponInfo = couponInfo;
+            }
+            if (null != optimalCouponInfo) {
+                optimalCouponInfo.setIsOptimal(1);
+            }
+
+        }
+//        6 返回数据
+        return userAllCouponInfo;
+    }
+
+
+    private BigDecimal computeTotalAmount(List<CartInfo> cartInfoList) {
+        BigDecimal total = new BigDecimal("0");
+        for (CartInfo cartInfo : cartInfoList) {
+            //是否选中
+            if (cartInfo.getIsChecked().intValue() == 1) {
+                BigDecimal itemTotal = cartInfo.getCartPrice().multiply(new BigDecimal(cartInfo.getSkuNum()));
+                total = total.add(itemTotal);
+            }
+        }
+        return total;
+    }
+
+    private Map<Long, List<Long>> findCouponIdToSkuIdMap(List<CartInfo> cartInfoList, List<CouponRange> couponRangeList) {
+        Map<Long, List<Long>> couponIdToSkuIdMap = new HashMap<>();
+
+//        根据优惠卷id进行分组
+        Map<Long, List<CouponRange>> couponRangeToRangeListMap = couponRangeList.stream().collect(Collectors.groupingBy(CouponRange::getCouponId));
+        for (Map.Entry<Long, List<CouponRange>> entry : couponRangeToRangeListMap.entrySet()) {
+            Long couponId = entry.getKey();
+            List<CouponRange> rangeList = entry.getValue();
+//            创建set集合，因为一个商品只能对一个优惠卷
+            Set<Long> skuIdSet = new HashSet<>();
+            for (CartInfo cartInfo : cartInfoList) {
+                for (CouponRange couponRange : rangeList) {
+                    if (couponRange.getRangeType() == CouponRangeType.SKU && couponRange.getRangeId() == cartInfo.getSkuId().longValue()) {
+                        skuIdSet.add(cartInfo.getSkuId());
+                    } else if (couponRange.getRangeType() == CouponRangeType.CATEGORY &&
+                            couponRange.getRangeId().longValue() == cartInfo.getCategoryId().longValue()) {
+                        skuIdSet.add(cartInfo.getSkuId());
+                    } else {
+
+                    }
+                }
+            }
+            couponIdToSkuIdMap.put(couponId, new ArrayList<>(skuIdSet));
+        }
+        return couponIdToSkuIdMap;
+
     }
 }
 

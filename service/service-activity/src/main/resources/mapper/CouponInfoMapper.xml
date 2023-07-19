@@ -2,8 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.zml.activity.mapper.CouponInfoMapper">
 
-
-    <select id="selectCouponList" resultType="com.zml.ssyx.model.activity.CouponInfo">
+    <resultMap id="CouponInfoMap" type="com.zml.ssyx.model.activity.CouponInfo" autoMapping="true">
+    </resultMap>
+    <select id="selectCouponList" resultMap="CouponInfoMap">
         select info.id
              , info.coupon_type
              , info.coupon_name
@@ -32,6 +33,18 @@
                 or (crange.range_type = 3 and crange.range_id = #{categoryId})
             )
           and now() between info.start_time and info.end_time
+        order by info.amount desc
+    </select>
+    <select id="selectCouponInfoList" resultMap="CouponInfoMap">
+        select
+        info.id,info.coupon_type,info.coupon_name,info.amount,info.condition_amount,info.start_time,info.end_time,info.range_type,info.range_desc,info.publish_count,info.per_limit,info.use_count,info.receive_count,info.expire_time,info.publish_status,info.create_time,info.update_time,info.is_deleted
+        ,cuse.coupon_status
+        from coupon_use cuse
+        left join coupon_info info on cuse.coupon_id = info.id
+        <where>
+            and cuse.user_id = #{userId}
+            and info.expire_time >= now()
+        </where>
         order by info.amount desc
     </select>
 </mapper>
