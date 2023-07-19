@@ -19,4 +19,6 @@ public interface CartService {
     void bathDeleteCart(List<Long> skuIdList, Long userId);
 
     List<CartInfo> getCartList(Long userId);
+
+    List<CartInfo> getCartCheckedList(Long userId);
 }

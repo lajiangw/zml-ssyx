@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author ZhangMinlei
@@ -134,6 +135,14 @@ public class CartServiceImpl implements CartService {
             }
         });
         return cartInfoList;
+    }
+
+    @Override
+    public List<CartInfo> getCartCheckedList(Long userId) {
+        String cartKey = this.getCartKey(userId);
+        BoundHashOperations<String, String, CartInfo> boundHashOperations = redisTemplate.boundHashOps(cartKey);
+        List<CartInfo> cartInfoList = boundHashOperations.values();
+        return Objects.requireNonNull(cartInfoList).stream().filter(cartInfo -> cartInfo.getIsChecked() == 1).collect(Collectors.toList());
     }
 
     //设置key过期时间
