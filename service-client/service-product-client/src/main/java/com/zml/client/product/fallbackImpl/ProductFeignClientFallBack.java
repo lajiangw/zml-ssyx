@@ -4,6 +4,7 @@ import com.zml.client.product.ProductFeignClient;
 import com.zml.ssyx.model.product.Category;
 import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.vo.product.SkuInfoVo;
+import com.zml.ssyx.vo.product.SkuStockLockVo;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Component;
 
@@ -54,6 +55,11 @@ public class ProductFeignClientFallBack implements ProductFeignClient {
 
     @Override
     public SkuInfoVo getSkuInfoVo(Long skuId) {
+        return null;
+    }
+
+    @Override
+    public Boolean checkAndLock(List<SkuStockLockVo> skuStockLockVoList, String orderNo) {
         return null;
     }
 }
