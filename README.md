@@ -24,3 +24,6 @@
 
 ### 技术架构
 SpringBoot，SpringCloud-alibaba，mybatis-plus，redis，Redisson，RabbitMQ，ElasticSearch，Kibana，ThreadPoolExecutor，OSS，Docker..微信支付,微信小程序
+![image](https://github.com/lajiangw/zml-ssyx/assets/83055327/dba00687-e6eb-4138-a6ac-6d05765414c8)
+
+
