@@ -1,10 +1,13 @@
 package com.zml.order.service;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.zml.ssyx.model.order.OrderInfo;
 import com.zml.ssyx.vo.order.OrderConfirmVo;
 import com.zml.ssyx.vo.order.OrderSubmitVo;
+import com.zml.ssyx.vo.order.OrderUserQueryVo;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -20,4 +23,6 @@ public interface OrderInfoService extends IService<OrderInfo> {
     OrderInfo getOrderInfoById(Long orderId);
 
     Long submitOrder(OrderSubmitVo orderParamVo, Long userId);
+
+    IPage<OrderInfo> selectPageList(Page<OrderInfo> orderInfoPage, OrderUserQueryVo orderUserQueryVo);
 }

@@ -1,5 +1,8 @@
 package com.zml.order.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zml.activity.client.ActivityFeignClient;
 import com.zml.cart.client.CartFeignClient;
@@ -8,13 +11,16 @@ import com.zml.client.user.UserFeignClient;
 import com.zml.constant.RedisConst;
 import com.zml.exception.SsyxException;
 import com.zml.order.mapper.OrderInfoMapper;
+import com.zml.order.mapper.OrderItemMapper;
 import com.zml.order.service.OrderInfoService;
 import com.zml.result.ResultCodeEnum;
 import com.zml.ssyx.enums.SkuType;
 import com.zml.ssyx.model.order.CartInfo;
 import com.zml.ssyx.model.order.OrderInfo;
+import com.zml.ssyx.model.order.OrderItem;
 import com.zml.ssyx.vo.order.OrderConfirmVo;
 import com.zml.ssyx.vo.order.OrderSubmitVo;
+import com.zml.ssyx.vo.order.OrderUserQueryVo;
 import com.zml.ssyx.vo.product.SkuStockLockVo;
 import com.zml.ssyx.vo.user.LeaderAddressVo;
 import com.zml.utils.JwtHelper;
@@ -56,6 +62,9 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
     @Resource
     private ProductFeignClient productFeignClient;
+
+    @Resource
+    private OrderItemMapper orderItemMapper;
 
     //    确认订单
     @Override
@@ -130,6 +139,26 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         Long orderId = this.saveOrder(orderParamVo, cartCheckedList);
 //        6返回订单id
         return null;
+    }
+
+    //    订单查询
+    @Override
+    public IPage<OrderInfo> selectPageList(Page<OrderInfo> orderInfoPage, OrderUserQueryVo orderUserQueryVo) {
+        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OrderInfo::getUserId, orderUserQueryVo.getUserId());
+        wrapper.eq(OrderInfo::getOrderStatus, orderUserQueryVo.getOrderStatus());
+        Page<OrderInfo> orderInfoPage1 = baseMapper.selectPage(orderInfoPage, wrapper);
+
+//        获取每个订单，把每个订单里面的订单项进行封装
+        List<OrderInfo> records = orderInfoPage1.getRecords();
+        for (OrderInfo orderInfo : records) {
+            List<OrderItem> orderItems = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                    .eq(OrderItem::getOrderId, orderInfo.getId()));
+            orderInfo.setOrderItemList(orderItems);
+
+            orderInfo.getParam().put("orderStatusName", orderInfo.getOrderStatus().getComment());
+        }
+        return orderInfoPage1;
     }
 
     private Long saveOrder(OrderSubmitVo orderParamVo, List<CartInfo> cartCheckedList) {
