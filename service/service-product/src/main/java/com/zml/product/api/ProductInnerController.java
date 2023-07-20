@@ -5,6 +5,7 @@ import com.zml.product.service.SkuInfoService;
 import com.zml.ssyx.model.product.Category;
 import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.vo.product.SkuInfoVo;
+import com.zml.ssyx.vo.product.SkuStockLockVo;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -53,22 +54,29 @@ public class ProductInnerController {
         return categoryService.listByIds(ids);
     }
 
-//获得所有分类
+    //获得所有分类
     @GetMapping("/inner/findAllCategoryList")
     public List<Category> findAllCategoryList() {
         return categoryService.list();
     }
 
-//    获得所有新人专项商品
+    //    获得所有新人专项商品
     @GetMapping("/inner/findNewPersonSkuInfoList")
-    public List<SkuInfo> findNewPersonSkuInfoList(){
-     return   skuInfoService.findNewPersonSkuInfoList();
+    public List<SkuInfo> findNewPersonSkuInfoList() {
+        return skuInfoService.findNewPersonSkuInfoList();
     }
 
-//    根据skuId获得Sku信息
+    //    根据skuId获得Sku信息
     @GetMapping("/inner/getSkuInfoVo/{skuId}")
-    public SkuInfoVo getSkuInfoVo(@PathVariable Long skuId){
+    public SkuInfoVo getSkuInfoVo(@PathVariable Long skuId) {
         return skuInfoService.getSkuInfoVo(skuId);
+    }
+
+    //    验证和锁定库存
+    @PostMapping("inner/checkAndLock/{orderNo}")
+    public Boolean checkAndLock(@RequestBody List<SkuStockLockVo> skuStockLockVoList,
+                                @PathVariable String orderNo) {
+        return skuInfoService.checkAndLock(skuStockLockVoList, orderNo);
     }
 
 }

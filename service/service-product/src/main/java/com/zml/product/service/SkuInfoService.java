@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.vo.product.SkuInfoQueryVo;
 import com.zml.ssyx.vo.product.SkuInfoVo;
+import com.zml.ssyx.vo.product.SkuStockLockVo;
 
 import java.util.List;
 
@@ -39,4 +40,6 @@ public interface SkuInfoService extends IService<SkuInfo> {
 
 
     SkuInfoVo getSkuInfoVo(Long skuId);
+
+    Boolean checkAndLock(List<SkuStockLockVo> skuInfoService, String orderNo);
 }

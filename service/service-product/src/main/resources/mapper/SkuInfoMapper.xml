@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zml.product.mapper.SkuInfoMapper">
+
+    <resultMap id="skuInfoMap" type="com.zml.ssyx.model.product.SkuInfo" autoMapping="true"/>
+    <update id="unlockStock">
+        update `shequ-product`.sku_info
+        set lock_stock = lock_stock - #{skuNum}
+        where id = #{skuId};
+    </update>
+
+
+    <select id="chekStock" resultMap="skuInfoMap">
+        select *
+        from `shequ-product`.sku_info
+        where id = #{skuId}
+          and stock - lock_stock > #{skuNum} for
+        update
+    </select>
+
+    <update id="lockStock">
+        update `shequ-product`.sku_info
+        set lock_stock = lock_stock + #{skuNum}
+        where id = #{skuId};
+    </update>
+
+
+</mapper>

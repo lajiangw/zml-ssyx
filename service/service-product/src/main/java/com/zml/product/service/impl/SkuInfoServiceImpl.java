@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zml.constant.RedisConst;
 import com.zml.mq.constant.MqConst;
 import com.zml.mq.service.RabbitService;
 import com.zml.product.mapper.SkuInfoMapper;
@@ -18,8 +19,12 @@ import com.zml.ssyx.model.product.SkuInfo;
 import com.zml.ssyx.model.product.SkuPoster;
 import com.zml.ssyx.vo.product.SkuInfoQueryVo;
 import com.zml.ssyx.vo.product.SkuInfoVo;
+import com.zml.ssyx.vo.product.SkuStockLockVo;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -35,8 +40,7 @@ import java.util.Objects;
  * @createDate 2023-07-11 14:01:34
  */
 @Service
-public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
-        implements SkuInfoService {
+public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo> implements SkuInfoService {
 
     //    图片
     @Autowired
@@ -52,6 +56,12 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
 
     @Resource
     private RabbitService rabbitService;
+
+    @Resource
+    private RedisTemplate redisTemplate;
+
+    @Resource
+    private RedissonClient redissonClient;
 
     @Override
     public IPage<SkuInfo> getList(Page<SkuInfo> skuInfoPage, SkuInfoQueryVo vo) {
@@ -212,9 +222,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         Page<SkuInfo> skuInfoPage = new Page<>(1, 3);
 
         LambdaQueryWrapper<SkuInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(SkuInfo::getIsNewPerson, 1)
-                .eq(SkuInfo::getPublishStatus, 1)
-                .orderByAsc(SkuInfo::getStock);
+        wrapper.eq(SkuInfo::getIsNewPerson, 1).eq(SkuInfo::getPublishStatus, 1).orderByAsc(SkuInfo::getStock);
         return baseMapper.selectPage(skuInfoPage, wrapper).getRecords();
 
     }
@@ -222,7 +230,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
     @Override
     public SkuInfoVo getSkuInfoVo(Long skuId) {
         SkuInfoVo skuInfoVo = new SkuInfoVo();
-//        查询基本信息
+//            查询基本信息
         SkuInfo skuInfo = baseMapper.selectById(skuId);
 
 //        查询图片
@@ -239,6 +247,57 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoMapper, SkuInfo>
         skuInfoVo.setSkuAttrValueList(attrValuesList);
         return skuInfoVo;
     }
+
+    @Override
+    public Boolean checkAndLock(List<SkuStockLockVo> skuStockLockVoList, String orderNo) {
+        //        判断集合是否为空，为空则直接返回
+        if (CollectionUtils.isEmpty(skuStockLockVoList)) {
+            return null;
+        }
+//        遍历集合，验证库存，锁定库存 具有原子性
+        skuStockLockVoList.forEach(skuStockLockVo -> {
+            this.checkLock(skuStockLockVo);
+        });
+//        只要有一个商品锁定失败，所有锁定的商品都解锁
+        boolean match = skuStockLockVoList.stream().anyMatch(skuStockLockVo -> !skuStockLockVo.getIsLock());
+        if (match) {
+//            解锁
+            skuStockLockVoList.stream().filter(SkuStockLockVo::getIsLock).forEach(skuStockLockVo -> baseMapper.unlockStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum()));
+            return false;
+        }
+//        4如果所有的商品都锁定成功，redis 缓存相关数据，为了方便后边解锁和减库存
+        redisTemplate.opsForValue().set(RedisConst.SROCK_INFO + orderNo, skuStockLockVoList);
+        //    验证和锁定库存
+        return true;
+    }
+
+    private void checkLock(SkuStockLockVo skuStockLockVo) {
+//        公平锁，在线程中等待时间最长的得到锁
+        RLock rLock = this.redissonClient.getFairLock(RedisConst.SKUKEY_PREFIX + skuStockLockVo.getSkuId());
+
+//        加锁
+        rLock.lock();
+        try {
+//      验证库存
+            SkuInfo skuInfo = baseMapper.chekStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum());
+//           没有满足要求的商品直接返回
+            if (skuInfo == null) {
+                skuStockLockVo.setIsLock(false);
+                return;
+            }
+//           有满足的商品
+//          更新操作
+            if (baseMapper.lockStock(skuStockLockVo.getSkuId(), skuStockLockVo.getSkuNum()) > 0) {
+                skuStockLockVo.setIsLock(true);
+            }
+        } finally {
+//            就算失败也会 解锁
+            rLock.unlock();
+        }
+
+    }
+
+
 }
 
 

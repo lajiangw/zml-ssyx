@@ -38,7 +38,7 @@ public class OrderInfoController {
         // 获取到用户Id
         String token = request.getHeader("token");
         Long userId = JwtHelper.getUserId(token);
-       Long orderId =  orderService.submitOrder(orderParamVo);
+       Long orderId =  orderService.submitOrder(orderParamVo,userId);
         return Result.ok();
     }
 
